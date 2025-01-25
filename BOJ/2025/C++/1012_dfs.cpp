@@ -1,56 +1,57 @@
 #include <iostream>
-#include <vector>
+#include <cstring>
 using namespace std;
 
+int test_case, width, height, cabbage;
 int board[51][51];
 bool isVisit[51][51];
-int test_case, m, n, k;
-
-int dx[4] = {-1, 0, 1, 0};
+int dx[4] = {1, 0, -1, 0};
 int dy[4] = {0, 1, 0, -1};
 
-void dfs (int y, int x) {
-    isVisit[y][x] = true;
-    for (int i = 0 ; i < 4; i++) {
-        int ny = y + dy[i];
+void dfs(int x, int y) {
+
+    isVisit[x][y] = true;
+    for (int i = 0; i < 4; i++) {
         int nx = x + dx[i];
-        if (nx < 0 || ny < 0 || ny >= n || nx >= m) continue;
-        if (board[ny][nx] == 0) continue;
-        if (isVisit[ny][nx]) continue;
-        dfs (ny, nx);
+        int ny = y + dy[i];
+        if (nx < 0 || ny < 0 || nx >= height || ny >= width) continue;
+        if (board[nx][ny] == 0|| isVisit[nx][ny]) continue;
+        dfs(nx, ny);
     }
 }
+
 int main() {
 
     ios::sync_with_stdio(0);
     cin.tie(0);
 
     cin >> test_case;
-
+    int x, y;
     for (int tc = 0; tc < test_case; tc++) {
-        cin >> m >> n >> k;
-        fill(&board[0][0], &board[0][0] + 51 * 51, 0);
-        fill(&isVisit[0][0], &isVisit[0][0] + 51 * 51, false);
 
-        int x, y;
-        for (int i = 0; i < k; i++) {
+        memset(board, 0, sizeof(board));
+        memset(isVisit, false, sizeof(isVisit));
+
+        cin >> width >> height >> cabbage; // 가로, 세로, 배추 위치
+        for (int i = 0; i < cabbage; i++) {
             cin >> x >> y;
             board[y][x] = 1;
         }
 
-        int worm = 0;
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                // 방문 x, 배추가 있는 곳
-                if (board[i][j] == 1 && !isVisit[i][j]) {
-                    dfs(i, j);
-                    worm++;
+        int worm_cnt = 0;
+        for (int row = 0; row < height; row++) {
+            for (int col = 0; col < width; col++) {
+                // 양배추가 심어져있고, 방문하지 않은 좌표인 경우 dfs 탐색.
+                if (board[row][col] == 1 && !isVisit[row][col]) {
+                    dfs(row, col);
+                    worm_cnt++;
                 }
             }
         }
 
-        cout << worm << '\n';
+        cout << worm_cnt << endl;
     }
+
 
 
     return 0;
