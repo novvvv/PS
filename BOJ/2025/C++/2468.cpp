@@ -1,50 +1,54 @@
 #include <iostream>
+#include <deque>
+#include <utility>
 using namespace std;
 
+int board[101][101];
+bool isVisit[101][101];
 int dx[4] = {-1, 0, 1, 0};
-int dy[4] = {0, 1, 0, -1};
+int dy[4] = {0, 1,0, -1};
+int n;
 
-int n, safe_area, max_safe_area = 0;
-int arr[101][101];
-bool is_visit[101][101];
-
-void dfs(int x, int y, int height) {
-  is_visit[x][y] = true;
-  for (int i = 0; i < 4; i++) {
-    int nx = x + dx[i];
-    int ny = y + dy[i];
-    if (nx < 0 || ny < 0 || nx >= n || ny >= n) continue; // exception
-    if (!is_visit[nx][ny] && arr[nx][ny] > height) dfs(nx, ny, height);
-  }
+void dfs(int x, int y, int depth) {
+    isVisit[x][y] = true;
+    for (int dir = 0; dir < 4; dir++) {
+        int nx =  x + dx[dir];
+        int ny = y + dy[dir];
+        if (nx < 0 || ny < 0 || nx >= n || ny >= n) continue;
+        if (isVisit[nx][ny] || board[nx][ny] <= depth ) continue;
+        dfs(nx, ny, depth);
+    }
 }
 
-int main() {
-
-  ios_base::sync_with_stdio(false);
-  cin.tie(NULL);
-  cin >> n;
-  for (int i = 0; i < n; i++) {
-    for (int j = 0; j < n; j++) {
-      cin >> arr[i][j];
-    }
-  }
-
-  // 0 ~ 100 bruteForce & DFS
-  for (int height = 0; height <= 100; height++) {
-    int safe_area = 0;
-    fill(&is_visit[0][0], &is_visit[0][0] + 101 * 101, false);
-
+int main(int argc, const char * argv[]) {
+    
+    ios_base::sync_with_stdio(false);
+    cin.tie(0);
+    
+    cin >> n;
+    
     for (int i = 0; i < n; i++) {
-      for (int j = 0; j < n; j++) {
-        if (arr[i][j] > height && !is_visit[i][j]) {
-          dfs(i, j, height);
-          safe_area++;
+        for (int j = 0; j < n; j++) {
+            cin >> board[i][j];
         }
-      }
     }
-    max_safe_area = max(max_safe_area, safe_area);
-  }
+    
+    int res = 0;
+    for (int depth = 0; depth <= 100; depth++) {
+        int area = 0;
+        fill(&isVisit[0][0], &isVisit[0][0] + 101 * 101, false);
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if ((board[i][j] > depth) && !isVisit[i][j]) {
+                    dfs(i, j, depth);
+                    area++;
+                }
+            }
+        }
+        res = max(res, area);
+    }
 
-  cout << max_safe_area<< endl;
-
+    cout << res << endl;
+    
+    return 0;
 }
